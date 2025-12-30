@@ -1,4 +1,4 @@
-/* Glassmorphism core */
+/* Glass and layout */
 .glass-panel {
   @apply bg-slate-900/70 border border-emerald-500/20 rounded-2xl p-4 md:p-5 shadow-xl shadow-emerald-950/50;
 }
@@ -80,6 +80,12 @@
   text-slate-300 hover:bg-slate-700/80 hover:text-emerald-300 transition;
 }
 
+.menu-link {
+  @apply px-3 py-1.5 rounded-full border border-transparent bg-slate-900/60
+  text-slate-200 hover:border-emerald-500/60 hover:text-emerald-300
+  hover:bg-slate-800/90 transition text-xs;
+}
+
 /* Tooltip */
 .tooltip {
   position: fixed;
@@ -96,8 +102,7 @@
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
 }
 
-/* Small utility for the mini-bars in chart */
+/* Mini chart bar */
 .chart-bar {
   border-radius: 9999px;
 }
-
