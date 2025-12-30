@@ -102,7 +102,7 @@ function updateMultiplierTable() {
 
   multipliers.forEach((M) => {
     const row = document.createElement("tr");
-    row.className = "bg-slate-900/70 border border-slate-800/80 rounded-xl";
+    row.className = "bg-slate-900/70 rounded-xl";
 
     const mCell = document.createElement("td");
     mCell.className = "px-3 py-2 text-xs";
@@ -198,7 +198,10 @@ function updateSipLumpsum() {
 
   let sipFV = 0;
   if (monthlyRate > 0 && n > 0) {
-    sipFV = sipAmt * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) * (1 + monthlyRate);
+    sipFV =
+      sipAmt *
+      ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate) *
+      (1 + monthlyRate);
   }
 
   const lumpFV = lumpAmt * Math.pow(1 + r, years);
@@ -207,10 +210,22 @@ function updateSipLumpsum() {
   const lumpInvested = lumpAmt;
 
   byId("sipFV").textContent = formatINR(sipFV);
-  byId("sipInvested").textContent = "Total Invested: " + formatINR(sipInvested);
+  byId("sipInvested").textContent =
+    "Total Invested: " + formatINR(sipInvested);
 
   byId("lumpFV").textContent = formatINR(lumpFV);
-  byId("lumpInvested").textContent = "Total Invested: " + formatINR(lumpInvested);
+  byId("lumpInvested").textContent =
+    "Total Invested: " + formatINR(lumpInvested);
+
+  // Personal finance summary mirrors
+  if (byId("sipFVClone")) {
+    byId("sipFVClone").textContent = formatINR(sipFV);
+    byId("sipInvestedClone").textContent =
+      "Total Invested: " + formatINR(sipInvested);
+    byId("lumpFVClone").textContent = formatINR(lumpFV);
+    byId("lumpInvestedClone").textContent =
+      "Total Invested: " + formatINR(lumpInvested);
+  }
 
   let winner = "Both are equal";
   let diff = Math.abs(sipFV - lumpFV);
@@ -222,6 +237,9 @@ function updateSipLumpsum() {
   }
 
   byId("winnerText").textContent = "The winner is: " + winner;
+  if (byId("winnerClone")) {
+    byId("winnerClone").textContent = "The winner is: " + winner;
+  }
 }
 
 // ---------- RETIREMENT GOAL TRACKER ----------
@@ -243,22 +261,59 @@ function updateRetirement() {
   let monthlySaving = 0;
   if (monthlyReturn > 0 && n > 0) {
     monthlySaving =
-      corpus / (((Math.pow(1 + monthlyReturn, n) - 1) / monthlyReturn) * (1 + monthlyReturn));
+      corpus /
+      (((Math.pow(1 + monthlyReturn, n) - 1) / monthlyReturn) *
+        (1 + monthlyReturn));
   }
 
   byId("retireExpense").textContent = formatINR(inflatedMonthly);
   byId("retireCorpus").textContent = formatINR(corpus);
   byId("retireMonthlySave").textContent = formatINR(monthlySaving);
 
+  // Personal finance mini snapshot
+  if (byId("retireExpenseMini")) {
+    byId("retireExpenseMini").textContent = formatINR(inflatedMonthly);
+    byId("retireCorpusMini").textContent = formatINR(corpus);
+  }
+
   const progress =
-    retireAge > currentAge
+    retireAge > 18
       ? ((currentAge - 18) / (retireAge - 18)) * 100
       : 0;
   byId("roadmapProgress").style.width =
     Math.min(100, Math.max(0, progress)) + "%";
 
   byId("roadmapLabelLeft").textContent = "Current Age: " + currentAge;
-  byId("roadmapLabelRight").textContent = "Retirement Age: " + retireAge;
+  byId("roadmapLabelRight").textContent =
+    "Retirement Age: " + retireAge;
+}
+
+// ---------- NAV MENU / SCROLL ----------
+function setupMenuScroll() {
+  document.querySelectorAll(".menu-link").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.getAttribute("data-scroll");
+      if (!target) return;
+      const el = document.querySelector(target);
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const offset = window.scrollY + rect.top - 80;
+      window.scrollTo({ top: offset, behavior: "smooth" });
+
+      const mobileMenu = byId("mobileMenu");
+      if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
+        mobileMenu.classList.add("hidden");
+      }
+    });
+  });
+
+  const btn = byId("mobileMenuBtn");
+  const mobileMenu = byId("mobileMenu");
+  if (btn && mobileMenu) {
+    btn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  }
 }
 
 // ---------- TABS ----------
@@ -286,8 +341,6 @@ const tooltipContent = {
     "Tenure: Investment duration in years. Longer tenure amplifies the power of compounding.",
   "comp-frequency":
     "Compounding Frequency: How often interest is added to principal. Monthly compounding grows faster than annual compounding.",
-  "log-years":
-    "Logarithmic Years: Exact math for time to multiply money using t = ln(M)/ln(1+r). Captures non-linear compounding effects.",
   "cd-ratio":
     "CD Ratio: Loans / Deposits. If a bank has ₹70 loans and ₹100 deposits, CD = 70%. Too high can indicate aggressive lending.",
   gnpa:
@@ -313,7 +366,9 @@ const tooltipContent = {
   expenses:
     "Current Monthly Expenses: Your present lifestyle spending. This is projected into the future using inflation.",
   inflation:
-    "Inflation: Annual increase in prices. At 6% inflation, costs roughly double in about 12 years (Rule of 72)."
+    "Inflation: Annual increase in prices. At 6% inflation, costs roughly double in about 12 years (Rule of 72).",
+  "log-years":
+    "Logarithmic Years: Exact math for time to multiply money using t = ln(M)/ln(1+r). Captures non-linear compounding effects."
 };
 
 function setupTooltips() {
@@ -343,7 +398,9 @@ function setupTooltips() {
 // ---------- INITIALIZATION ----------
 document.addEventListener("DOMContentLoaded", () => {
   setupTabs();
+  setupMenuScroll();
   setupTooltips();
+
   handleGlobalChange();
   updateBankingRatios();
   updateStockRatios();
