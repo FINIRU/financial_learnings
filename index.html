@@ -11,221 +11,73 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-body {
-  background: radial-gradient(circle at top, #020617, #000);
-}
-.glass {
-  background: rgba(15,23,42,0.75);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-.input {
-  width: 100%;
-  padding: 8px;
-  background: #020617;
-  border: 1px solid #334155;
-  border-radius: 6px;
-}
-.tab { display:none; }
-.tab.active { display:block; }
-.menu-btn {
-  padding: 6px 14px;
-  border-radius: 6px;
-}
-.menu-btn.active {
-  background: #0ea5e9;
-  color: #020617;
-}
-</style>
+<!-- Custom CSS -->
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="text-gray-200">
 
 <div class="max-w-7xl mx-auto p-6 space-y-6">
 
-<!-- HEADER -->
 <h1 class="text-4xl font-bold text-cyan-400 text-center">
 Universal Financial Analytics Workstation
 </h1>
-<p class="text-center text-gray-400">
-Simple Finance • Stocks • Banking • Goals
-</p>
 
-<!-- GLOBAL ASSUMPTIONS -->
-<div class="glass p-6 rounded-xl grid md:grid-cols-4 gap-4">
+<!-- GLOBAL INPUTS -->
+<div class="glass grid md:grid-cols-4 gap-4 p-6 rounded-xl">
   <input id="P" class="input" type="number" value="100000" placeholder="Principal ₹">
   <input id="R" class="input" type="number" value="12" placeholder="Return %">
   <input id="T" class="input" type="number" value="10" placeholder="Years">
   <input id="inflation" class="input" type="number" value="6" placeholder="Inflation %">
 </div>
 
-<!-- MAIN MENU -->
+<!-- MENU -->
 <div class="flex space-x-3 border-b border-slate-700 pb-2">
-  <button class="menu-btn active" onclick="switchTab('finance',this)">Simple Finance</button>
+  <button class="menu-btn active" onclick="switchTab('finance',this)">Finance</button>
   <button class="menu-btn" onclick="switchTab('stocks',this)">Stocks</button>
   <button class="menu-btn" onclick="switchTab('banking',this)">Banking</button>
   <button class="menu-btn" onclick="switchTab('goals',this)">Goals</button>
 </div>
 
-<!-- SIMPLE FINANCE -->
+<!-- FINANCE -->
 <div id="finance" class="tab active glass p-6 rounded-xl space-y-6">
   <div class="grid md:grid-cols-2 gap-6">
-    <div>
-      <p class="text-gray-400">Simple Interest Value</p>
-      <p id="si" class="text-2xl font-bold text-cyan-400"></p>
-    </div>
-    <div>
-      <p class="text-gray-400">Compound Interest Value</p>
-      <p id="ci" class="text-2xl font-bold text-green-400"></p>
-    </div>
+    <p>Simple Interest: <span id="si"></span></p>
+    <p>Compound Interest: <span id="ci"></span></p>
   </div>
   <canvas id="interestChart"></canvas>
 </div>
 
 <!-- STOCKS -->
-<div id="stocks" class="tab glass p-6 rounded-xl space-y-6">
-  <h2 class="text-xl text-cyan-400">Stock Market Ratios</h2>
-  <div class="grid md:grid-cols-3 gap-4">
-    <input id="price" class="input" placeholder="Market Price">
-    <input id="eps" class="input" placeholder="EPS">
-    <p>P/E: <span id="pe"></span></p>
-
-    <input id="netIncome" class="input" placeholder="Net Income">
-    <input id="equity" class="input" placeholder="Equity">
-    <p>ROE: <span id="roe"></span></p>
-
-    <input id="ebit" class="input" placeholder="EBIT">
-    <input id="capital" class="input" placeholder="Capital Employed">
-    <p>ROCE: <span id="roce"></span></p>
-
-    <input id="debt" class="input" placeholder="Debt">
-    <input id="equity2" class="input" placeholder="Equity">
-    <p>Debt/Equity: <span id="de"></span></p>
-  </div>
+<div id="stocks" class="tab glass p-6 rounded-xl space-y-4">
+  <h2 class="text-cyan-400 text-xl">Stock Ratios</h2>
+  <input id="price" class="input" placeholder="Market Price">
+  <input id="eps" class="input" placeholder="EPS">
+  <p>P/E: <span id="pe"></span></p>
 </div>
 
 <!-- BANKING -->
-<div id="banking" class="tab glass p-6 rounded-xl space-y-6">
-  <h2 class="text-xl text-cyan-400">Banking Ratios</h2>
-  <div class="grid md:grid-cols-3 gap-4">
-    <input id="loans" class="input" placeholder="Total Loans">
-    <input id="deposits" class="input" placeholder="Deposits">
-    <p>CD Ratio: <span id="cdr"></span></p>
-
-    <input id="nii" class="input" placeholder="Net Interest Income">
-    <input id="earningAssets" class="input" placeholder="Earning Assets">
-    <p>NIM: <span id="nim"></span></p>
-
-    <input id="npa" class="input" placeholder="Gross NPA">
-    <input id="advances" class="input" placeholder="Advances">
-    <p>GNPA %: <span id="gnpa"></span></p>
-
-    <input id="casa" class="input" placeholder="CASA Deposits">
-    <input id="totalDeposits" class="input" placeholder="Total Deposits">
-    <p>CASA %: <span id="casaRatio"></span></p>
-  </div>
+<div id="banking" class="tab glass p-6 rounded-xl space-y-4">
+  <h2 class="text-cyan-400 text-xl">Banking Ratios</h2>
+  <input id="loans" class="input" placeholder="Loans">
+  <input id="deposits" class="input" placeholder="Deposits">
+  <p>CD Ratio: <span id="cdr"></span></p>
 </div>
 
 <!-- GOALS -->
-<div id="goals" class="tab glass p-6 rounded-xl space-y-8">
-  <h2 class="text-xl text-cyan-400">Goal Planning</h2>
-
-  <div class="grid md:grid-cols-2 gap-6">
-    <input id="sipAmount" class="input" placeholder="Monthly SIP ₹">
-    <input id="lumpAmount" class="input" placeholder="Lumpsum ₹">
-  </div>
-
-  <div class="grid md:grid-cols-2 gap-6">
-    <div>
-      <p class="text-gray-400">SIP Final Value</p>
-      <p id="sipFV" class="text-2xl font-bold text-green-400"></p>
-    </div>
-    <div>
-      <p class="text-gray-400">Lumpsum Final Value</p>
-      <p id="lumpFV" class="text-2xl font-bold text-cyan-400"></p>
-    </div>
-  </div>
-
+<div id="goals" class="tab glass p-6 rounded-xl space-y-4">
+  <h2 class="text-cyan-400 text-xl">SIP vs Lumpsum</h2>
+  <input id="sipAmount" class="input" placeholder="Monthly SIP">
+  <input id="lumpAmount" class="input" placeholder="Lumpsum">
+  <p>SIP Value: <span id="sipFV"></span></p>
+  <p>Lumpsum Value: <span id="lumpFV"></span></p>
   <canvas id="sipChart"></canvas>
-
-  <div class="mt-6">
-    <p class="text-gray-400">Inflation Adjusted Retirement Value</p>
-    <p id="realValue" class="text-xl font-bold"></p>
-  </div>
 </div>
 
 </div>
 
-<script>
-let interestChart, sipChart;
-
-function switchTab(id,btn){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.menu-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
-}
-
-function recalc(){
-  const P=+P.value, Rv=+R.value/100, Tn=+T.value, inf=+inflation.value/100;
-
-  si.innerText="₹"+(P*(1+Rv*Tn)).toFixed(0);
-  ci.innerText="₹"+(P*Math.pow(1+Rv,Tn)).toFixed(0);
-
-  // Interest chart
-  let years=[], siArr=[], ciArr=[];
-  for(let i=0;i<=Tn;i++){
-    years.push(i);
-    siArr.push(P*(1+Rv*i));
-    ciArr.push(P*Math.pow(1+Rv,i));
-  }
-  if(interestChart) interestChart.destroy();
-  interestChart=new Chart(interestChartCanvas,{
-    type:'line',
-    data:{labels:years,datasets:[
-      {label:'Simple',data:siArr,borderColor:'#38bdf8'},
-      {label:'Compound',data:ciArr,borderColor:'#22c55e'}
-    ]}
-  });
-
-  pe.innerText=eps.value?(price.value/eps.value).toFixed(2):"—";
-  roe.innerText=equity.value?((netIncome.value/equity.value)*100).toFixed(2)+"%":"—";
-  roce.innerText=capital.value?((ebit.value/capital.value)*100).toFixed(2)+"%":"—";
-  de.innerText=equity2.value?(debt.value/equity2.value).toFixed(2):"—";
-
-  cdr.innerText=deposits.value?(loans.value/deposits.value).toFixed(2):"—";
-  nim.innerText=earningAssets.value?((nii.value/earningAssets.value)*100).toFixed(2)+"%":"—";
-  gnpa.innerText=advances.value?((npa.value/advances.value)*100).toFixed(2)+"%":"—";
-  casaRatio.innerText=totalDeposits.value?((casa.value/totalDeposits.value)*100).toFixed(2)+"%":"—";
-
-  const sip=+sipAmount.value, lump=+lumpAmount.value;
-  const r=Rv/12, n=Tn*12;
-
-  if(sip){
-    const sipVal=sip*((Math.pow(1+r,n)-1)/r)*(1+r);
-    sipFV.innerText="₹"+sipVal.toFixed(0);
-    lumpFV.innerText=lump?"₹"+(lump*Math.pow(1+r,n)).toFixed(0):"—";
-
-    if(sipChart) sipChart.destroy();
-    sipChart=new Chart(sipChartCanvas,{
-      type:'line',
-      data:{labels:Array.from({length:n},(_,i)=>i+1),
-      datasets:[
-        {label:'SIP',data:Array(n).fill(sipVal),borderColor:'#22c55e'},
-        {label:'Lumpsum',data:Array(n).fill(lump*Math.pow(1+r,n)),borderColor:'#38bdf8',borderDash:[6,6]}
-      ]}
-    });
-  }
-
-  realValue.innerText="₹"+(P/Math.pow(1+inf,Tn)).toFixed(0);
-}
-
-const interestChartCanvas=document.getElementById("interestChart");
-const sipChartCanvas=document.getElementById("sipChart");
-document.querySelectorAll("input").forEach(i=>i.oninput=recalc);
-recalc();
-</script>
-
+<!-- Custom JS -->
+<script src="script.js"></script>
 </body>
 </html>
+
