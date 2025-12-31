@@ -1,116 +1,378 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quant-Core | Universal Financial Analytics</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <title>Universal Financial Analytics Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="app-bg"></div>
 
-<div class="dashboard-container">
-    <header>
-        <h1>UNIVERSAL FINANCIAL ANALYTICS</h1>
-        <p>Real-time Quantitative Decision Engine</p>
-    </header>
-
-    <section class="card">
-        <h3><span class="accent">●</span> Global Master Parameters</h3>
-        <div class="grid-3">
-            <div>
-                <label>Principal (Amount)</label>
-                <input type="number" id="globalP" value="100000">
-            </div>
-            <div>
-                <label>Annual Interest Rate (%)</label>
-                <input type="number" id="globalR" value="10">
-            </div>
-            <div>
-                <label>Tenure (Years)</label>
-                <input type="number" id="globalT" value="10">
-            </div>
-        </div>
-    </section>
-
-    <div class="grid-2">
-        <section class="card">
-            <h3>SIP vs. Lumpsum Battleground <span class="info-icon" data-tooltip="SIP: Periodic monthly investing. Lumpsum: Large immediate deployment.">i</span></h3>
-            <div id="battleResult" class="winner-label"></div>
-            <div class="chart-container">
-                <canvas id="siplumpChart"></canvas>
-            </div>
-        </section>
-
-        <section class="card">
-            <h3>Wealth Multiplier Roadmap <span class="info-icon" data-tooltip="Calculated using Natural Logarithms to find precise time for growth milestones.">i</span></h3>
-            <table>
-                <thead>
-                    <tr><th>Target</th><th>Years to Reach</th><th>Ending Wealth</th></tr>
-                </thead>
-                <tbody id="multiplierTable">
-                    </tbody>
-            </table>
-        </section>
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-logo">UF</div>
+      <div>
+        <div class="brand-title">Universal Financial Analytics</div>
+        <div class="brand-subtitle">Wealth · Banking · Markets · Retirement</div>
+      </div>
     </div>
+    <nav class="nav">
+      <button class="nav-link" data-scroll="#global-section">Global</button>
+      <button class="nav-link" data-scroll="#interest-section">Interest</button>
+      <button class="nav-link" data-scroll="#wealth-section">Wealth x</button>
+      <button class="nav-link" data-scroll="#ratios-section">Ratios</button>
+      <button class="nav-link" data-scroll="#sip-section">SIP vs Lumpsum</button>
+      <button class="nav-link" data-scroll="#retirement-section">Retirement</button>
+    </nav>
+    <button id="navToggle" class="nav-toggle">☰</button>
+  </header>
 
-    <section class="card">
-        <h3>Retirement Corpus & Inflation Logic <span class="info-icon" data-tooltip="Calculates future costs based on 6% inflation and the '25x' safety rule.">i</span></h3>
-        <div class="grid-3">
-            <div>
-                <label>Current Age</label>
-                <input type="number" id="currAge" value="25">
-            </div>
-            <div>
-                <label>Retire Age</label>
-                <input type="number" id="retAge" value="60">
-            </div>
-            <div>
-                <label>Monthly Exp (Current)</label>
-                <input type="number" id="currExp" value="50000">
-            </div>
+  <nav id="navMobile" class="nav-mobile hidden">
+    <button class="nav-link" data-scroll="#global-section">Global</button>
+    <button class="nav-link" data-scroll="#interest-section">Interest</button>
+    <button class="nav-link" data-scroll="#wealth-section">Wealth x</button>
+    <button class="nav-link" data-scroll="#ratios-section">Ratios</button>
+    <button class="nav-link" data-scroll="#sip-section">SIP vs Lumpsum</button>
+    <button class="nav-link" data-scroll="#retirement-section">Retirement</button>
+  </nav>
+
+  <main class="container">
+    <!-- GLOBAL INPUTS -->
+    <section id="global-section" class="card">
+      <div class="card-header">
+        <h2>Global Input Center</h2>
+        <p>These values drive interest, wealth multipliers, SIP vs Lumpsum, and retirement planning.</p>
+      </div>
+      <div class="grid-4">
+        <div class="field">
+          <label>Principal (P) – ₹</label>
+          <input id="globalPrincipal" type="number" value="100000" min="0" />
         </div>
-        <div class="grid-3 results-row">
-            <div class="mini-card">
-                <label>Monthly Exp (At Retire)</label>
-                <div id="inflatedExp" class="result-value">₹0</div>
-            </div>
-            <div class="mini-card">
-                <label>Target Corpus Needed</label>
-                <div id="targetCorpus" class="result-value">₹0</div>
-            </div>
-            <div class="mini-card">
-                <label>Required Monthly Saving</label>
-                <div id="reqSaving" class="result-value">₹0</div>
-            </div>
+        <div class="field">
+          <label>
+            Rate of Interest (R) % p.a.
+            <span class="help-icon" data-help="global-rate">?</span>
+          </label>
+          <input id="globalRate" type="number" value="11" step="0.1" min="0" max="100" />
         </div>
+        <div class="field">
+          <label>
+            Tenure (T) – Years
+            <span class="help-icon" data-help="global-tenure">?</span>
+          </label>
+          <input id="globalYears" type="number" value="10" min="1" max="50" />
+        </div>
+        <div class="field">
+          <label>
+            Compounding / Year
+            <span class="help-icon" data-help="comp-frequency">?</span>
+          </label>
+          <select id="compoundFreq">
+            <option value="1">Annual</option>
+            <option value="2">Half-yearly</option>
+            <option value="4">Quarterly</option>
+            <option value="12" selected>Monthly</option>
+          </select>
+        </div>
+      </div>
     </section>
 
-    <section class="card">
-        <h3>Institutional Ratio Grid</h3>
-        <div class="grid-3">
-            <div class="ratio-input-group">
-                <label>P/E Ratio <span class="info-icon" data-tooltip="Price to Earnings: Tells you how much you pay for ₹1 of profit.">i</span></label>
-                <input type="number" id="stockPrice" placeholder="Price">
-                <input type="number" id="stockEPS" placeholder="EPS">
-                <div id="peResult" class="result-value">0.00</div>
-            </div>
-            <div class="ratio-input-group">
-                <label>Debt-to-Equity <span class="info-icon" data-tooltip="Measures financial leverage and solvency.">i</span></label>
-                <input type="number" id="totalDebt" placeholder="Total Debt">
-                <input type="number" id="totalEquity" placeholder="Shareholder Equity">
-                <div id="deResult" class="result-value">0.00</div>
-            </div>
-            <div class="ratio-input-group">
-                <label>Banking: CD Ratio <span class="info-icon" data-tooltip="Credit-to-Deposit Ratio: Ideal range is 70-80%.">i</span></label>
-                <input type="number" id="totalLoans" placeholder="Total Loans">
-                <input type="number" id="totalDeposits" placeholder="Total Deposits">
-                <div id="cdResult" class="result-value">0%</div>
-            </div>
-        </div>
-    </section>
-</div>
+    <!-- TABS WRAPPER -->
+    <section id="interest-section" class="card">
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="tab-interest">Interest Master</button>
+        <button class="tab-btn" data-tab="tab-wealth">Wealth Multiplier</button>
+        <button class="tab-btn" data-tab="tab-ratios">Stock & Banking Ratios</button>
+      </div>
 
-<script src="script.js"></script>
+      <!-- INTEREST MASTER TAB -->
+      <div id="tab-interest" class="tab-panel active">
+        <div class="grid-2">
+          <div>
+            <h3>Interest Master: Simple vs Compound</h3>
+            <div class="grid-2 mt-sm">
+              <div class="stat">
+                <div class="stat-label">Simple Interest</div>
+                <div id="siAmount" class="stat-value">₹0</div>
+                <div id="siTotal" class="stat-sub">Total Value: ₹0</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Compound Interest</div>
+                <div id="ciAmount" class="stat-value">₹0</div>
+                <div id="ciTotal" class="stat-sub">Total Value: ₹0</div>
+              </div>
+            </div>
+            <p class="note">
+              Simple interest is linear growth; compound interest uses
+              \( A = P(1 + r/n)^{nt} \) so your money accelerates over time. [web:100]
+            </p>
+          </div>
+
+          <div>
+            <h3>Comparison Chart: Simple vs Compound</h3>
+            <div class="chart-card">
+              <div class="chart-header">
+                <span>Growth over time</span>
+                <span id="chartYearsLabel"></span>
+              </div>
+              <div id="interestChart" class="chart-body">
+                <!-- Bars injected by JS -->
+              </div>
+              <div class="chart-legend">
+                <span class="legend-item">
+                  <span class="legend-color compound"></span> Compound
+                </span>
+                <span class="legend-item">
+                  <span class="legend-color simple"></span> Simple
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEALTH MULTIPLIER TAB -->
+      <div id="tab-wealth" class="tab-panel">
+        <h3>Wealth Multiplier Milestones</h3>
+        <p class="note">
+          Using \( t = \ln(M)/\ln(1 + r) \) to compute exact years for your money
+          to reach 2x, 5x, 10x, and 100x, plus a Rule of 72 approximation. [web:93]
+        </p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Multiplier</th>
+                <th>Rule of 72 (Approx)</th>
+                <th>Logarithmic Years (Exact)</th>
+              </tr>
+            </thead>
+            <tbody id="multiplierBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RATIOS TAB -->
+      <div id="tab-ratios" class="tab-panel">
+        <div class="grid-2">
+          <!-- Banking -->
+          <div>
+            <h3>Banking Ratios</h3>
+            <div class="ratio-card">
+              <div class="ratio-header">
+                <span>Credit-Deposit (CD) Ratio</span>
+                <span class="help-icon" data-help="cd-ratio">?</span>
+              </div>
+              <div class="grid-2 mt-xs">
+                <input id="cdLoans" type="number" class="input" placeholder="Total Loans (₹)" />
+                <input id="cdDeposits" type="number" class="input" placeholder="Total Deposits (₹)" />
+              </div>
+              <div id="cdResult" class="ratio-result">–</div>
+            </div>
+
+            <div class="ratio-card">
+              <div class="ratio-header">
+                <span>Gross NPA Ratio</span>
+                <span class="help-icon" data-help="gnpa">?</span>
+              </div>
+              <div class="grid-2 mt-xs">
+                <input id="grossNPA" type="number" class="input" placeholder="Gross NPAs (₹)" />
+                <input id="grossAdvances" type="number" class="input" placeholder="Gross Advances (₹)" />
+              </div>
+              <div id="gnpaResult" class="ratio-result">–</div>
+            </div>
+
+            <div class="ratio-card">
+              <div class="ratio-header">
+                <span>Net Interest Margin (NIM)</span>
+                <span class="help-icon" data-help="nim">?</span>
+              </div>
+              <div class="grid-2 mt-xs">
+                <input id="netInterestIncome" type="number" class="input" placeholder="Net Interest Income (₹)" />
+                <input id="earningAssets" type="number" class="input" placeholder="Avg Earning Assets (₹)" />
+              </div>
+              <div id="nimResult" class="ratio-result">–</div>
+            </div>
+          </div>
+
+          <!-- Stocks -->
+          <div>
+            <h3>Stock & Equity Ratios</h3>
+            <div class="ratio-card">
+              <div class="ratio-header">
+                <span>Price / Earnings (P/E)</span>
+                <span class="help-icon" data-help="pe">?</span>
+              </div>
+              <div class="grid-2 mt-xs">
+                <input id="pricePerShare" type="number" class="input" placeholder="Price per Share (₹)" />
+                <input id="eps" type="number" class="input" placeholder="Earnings per Share (₹)" />
+              </div>
+              <div id="peResult" class="ratio-result">–</div>
+            </div>
+
+            <div class="ratio-card">
+              <div class="ratio-header">
+                <span>Price / Book (P/B)</span>
+                <span class="help-icon" data-help="pb">?</span>
+              </div>
+              <div class="mt-xs">
+                <input id="bookValue" type="number" class="input" placeholder="Book Value per Share (₹)" />
+              </div>
+              <div id="pbResult" class="ratio-result">–</div>
+            </div>
+
+            <div class="ratio-card">
+              <div class="ratio-header">
+                <span>ROE, ROCE & Debt/Equity</span>
+                <span class="help-icon" data-help="roe-roce-dte">?</span>
+              </div>
+              <div class="grid-2 mt-xs">
+                <input id="netIncome" type="number" class="input" placeholder="Net Income (₹)" />
+                <input id="shareholdersEquity" type="number" class="input" placeholder="Shareholders' Equity (₹)" />
+              </div>
+              <div class="grid-2 mt-xs">
+                <input id="ebit" type="number" class="input" placeholder="EBIT (₹)" />
+                <input id="capitalEmployed" type="number" class="input" placeholder="Capital Employed (₹)" />
+              </div>
+              <div class="grid-2 mt-xs">
+                <input id="totalDebt" type="number" class="input" placeholder="Total Debt (₹)" />
+                <input id="equity" type="number" class="input" placeholder="Equity (₹)" />
+              </div>
+              <div id="roeResult" class="ratio-result">ROE: –</div>
+              <div id="roceResult" class="ratio-result">ROCE: –</div>
+              <div id="dteResult" class="ratio-result">Debt/Equity: –</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIP vs Lumpsum -->
+    <section id="sip-section" class="card">
+      <div class="card-header">
+        <h2>SIP vs Lumpsum Battleground</h2>
+        <p>
+          Compare disciplined monthly investing vs one-time investing, and see which strategy wins for your parameters. [web:98][web:104]
+        </p>
+      </div>
+
+      <div class="grid-4">
+        <div class="field">
+          <label>
+            SIP Monthly Amount (₹)
+            <span class="help-icon" data-help="sip">?</span>
+          </label>
+          <input id="sipAmount" type="number" value="10000" min="0" />
+        </div>
+        <div class="field">
+          <label>
+            Lumpsum Amount (₹)
+            <span class="help-icon" data-help="lumpsum">?</span>
+          </label>
+          <input id="lumpAmount" type="number" value="200000" min="0" />
+        </div>
+        <div class="field">
+          <label>
+            Expected Return (% p.a.)
+            <span class="help-icon" data-help="expected-return">?</span>
+          </label>
+          <input id="sipRate" type="number" value="12" step="0.1" min="0" max="100" />
+        </div>
+        <div class="field">
+          <label>Tenure (Years)</label>
+          <input id="sipYears" type="number" value="15" min="1" max="50" />
+        </div>
+      </div>
+
+      <div class="grid-3 mt-sm">
+        <div class="stat">
+          <div class="stat-label">SIP Future Value</div>
+          <div id="sipFV" class="stat-value">₹0</div>
+          <div id="sipInvested" class="stat-sub">Total Invested: ₹0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Lumpsum Future Value</div>
+          <div id="lumpFV" class="stat-value">₹0</div>
+          <div id="lumpInvested" class="stat-sub">Total Invested: ₹0</div>
+        </div>
+        <div class="winner-card">
+          <div class="winner-label">Decision Engine</div>
+          <div id="winnerText" class="winner-value">Winner will appear here.</div>
+          <div class="winner-note">
+            Lumpsum usually earns more due to time in the market, while SIP builds disciplined investing habits. [web:107]
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RETIREMENT -->
+    <section id="retirement-section" class="card">
+      <div class="card-header">
+        <h2>Retirement Goal Tracker (Corpus Builder)</h2>
+        <p>
+          Inflation-adjusted lifestyle, target corpus via 4% rule, and monthly saving needed assuming 12% equity returns. [web:96][web:105][web:108]
+        </p>
+      </div>
+
+      <div class="grid-4">
+        <div class="field">
+          <label>Current Age</label>
+          <input id="currentAge" type="number" value="30" min="18" max="60" />
+        </div>
+        <div class="field">
+          <label>Desired Retirement Age</label>
+          <input id="retireAge" type="number" value="60" min="30" max="80" />
+        </div>
+        <div class="field">
+          <label>
+            Current Monthly Expenses (₹)
+            <span class="help-icon" data-help="expenses">?</span>
+          </label>
+          <input id="currentExpenses" type="number" value="50000" min="0" />
+        </div>
+        <div class="field">
+          <label>
+            Inflation Rate (%)
+            <span class="help-icon" data-help="inflation">?</span>
+          </label>
+          <input id="inflationRate" type="number" value="6" step="0.1" min="0" max="20" />
+        </div>
+      </div>
+
+      <div class="grid-3 mt-sm">
+        <div class="stat">
+          <div class="stat-label">Monthly Expense at Retirement</div>
+          <div id="retireExpense" class="stat-value">₹0</div>
+          <div class="stat-sub">Inflation-adjusted lifestyle cost per month.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Target Retirement Corpus</div>
+          <div id="retireCorpus" class="stat-value">₹0</div>
+          <div class="stat-sub">25× annual expenses (4% withdrawal rule).</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Required Monthly Savings (Now)</div>
+          <div id="retireMonthlySave" class="stat-value">₹0</div>
+          <div class="stat-sub">Assuming 12% annual equity returns till retirement.</div>
+        </div>
+      </div>
+
+      <div class="roadmap">
+        <div class="roadmap-header">
+          <span id="roadmapLabelLeft">Age</span>
+          <span id="roadmapLabelRight">Retirement</span>
+        </div>
+        <div class="roadmap-bar">
+          <div id="roadmapProgress" class="roadmap-progress"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOLTIP -->
+    <div id="tooltip" class="tooltip hidden"></div>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
