@@ -25,7 +25,9 @@
       <button class="nav-link" data-scroll="#sip-section">SIP vs Lumpsum</button>
       <button class="nav-link" data-scroll="#retirement-section">Retirement</button>
       <!-- NEW: metals & currency -->
-  <button class="nav-link" data-scroll="#metals-section">Gold · Silver · FX</button>
+      <button class="nav-link" data-scroll="#metals-section">
+        Gold · Silver · FX
+      </button>
     </nav>
     <button id="navToggle" class="nav-toggle">☰</button>
   </header>
@@ -37,6 +39,10 @@
     <button class="nav-link" data-scroll="#ratios-section">Ratios</button>
     <button class="nav-link" data-scroll="#sip-section">SIP vs Lumpsum</button>
     <button class="nav-link" data-scroll="#retirement-section">Retirement</button>
+    <!-- NEW -->
+    <button class="nav-link" data-scroll="#metals-section">
+      Gold · Silver · FX
+    </button>
   </nav>
 
   <main class="container">
@@ -118,9 +124,7 @@
                 <span>Growth over time</span>
                 <span id="chartYearsLabel"></span>
               </div>
-              <div id="interestChart" class="chart-body">
-                <!-- Bars injected by JS -->
-              </div>
+              <div id="interestChart" class="chart-body"></div>
               <div class="chart-legend">
                 <span class="legend-item">
                   <span class="legend-color compound"></span> Compound
@@ -367,6 +371,137 @@
         </div>
         <div class="roadmap-bar">
           <div id="roadmapProgress" class="roadmap-progress"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- METALS + CURRENCY SCENARIOS -->
+    <section id="metals-section" class="card">
+      <div class="card-header">
+        <h2>Gold · Silver · Stocks · Currency Engine</h2>
+        <p>
+          Explore how gold, silver and equities may behave across scenarios like crisis, inflation or strong rupee/weak rupee environments. [web:4][web:7][web:10][web:13]
+        </p>
+      </div>
+
+      <!-- Scenario selector -->
+      <div class="grid-3 mt-sm">
+        <div class="field">
+          <label>
+            Market Scenario
+            <span class="help-icon" data-help="scenario">?</span>
+          </label>
+          <select id="scenarioSelect">
+            <option value="crisis">Crisis / Risk-off</option>
+            <option value="normal">Normal Growth</option>
+            <option value="inflation">High Inflation / Negative Real Rates</option>
+            <option value="liquidity">Liquidity Boom / Everything Rally</option>
+            <option value="industrial">Industrial / Commodity Upswing</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>
+            Currency Move (vs USD)
+            <span class="help-icon" data-help="fx">?</span>
+          </label>
+          <select id="fxMoveSelect">
+            <option value="flat">Flat / Stable</option>
+            <option value="inrWeak">INR Weak / USD Up</option>
+            <option value="inrStrong">INR Strong / USD Down</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>
+            Risk Sentiment
+            <span class="help-icon" data-help="risk">?</span>
+          </label>
+          <select id="riskSelect">
+            <option value="low">Low Fear</option>
+            <option value="medium" selected>Balanced</option>
+            <option value="high">High Fear</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Impact bars -->
+      <div class="mt-sm">
+        <h3>Expected 12–24 Month Impact (Qualitative)</h3>
+        <p class="note">
+          These are not forecasts, but directional tendencies combining scenario, currency and risk sentiment for gold, silver and equities. [web:4][web:7][web:10][web:13]
+        </p>
+
+        <div class="grid-3 mt-xs">
+          <!-- Gold -->
+          <div class="stat">
+            <div class="stat-label">Gold</div>
+            <div id="goldImpactText" class="stat-sub">–</div>
+            <div class="impact-bar-wrapper">
+              <div class="impact-bar-track">
+                <div id="goldImpactBar" class="impact-bar-fill"></div>
+              </div>
+              <div class="impact-scale">
+                <span>Bearish</span><span>Neutral</span><span>Strong Bullish</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Silver -->
+          <div class="stat">
+            <div class="stat-label">Silver</div>
+            <div id="silverImpactText" class="stat-sub">–</div>
+            <div class="impact-bar-wrapper">
+              <div class="impact-bar-track">
+                <div id="silverImpactBar" class="impact-bar-fill"></div>
+              </div>
+              <div class="impact-scale">
+                <span>Bearish</span><span>Neutral</span><span>High Beta</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Equities -->
+          <div class="stat">
+            <div class="stat-label">Equity Index</div>
+            <div id="equityImpactText" class="stat-sub">–</div>
+            <div class="impact-bar-wrapper">
+              <div class="impact-bar-track">
+                <div id="equityImpactBar" class="impact-bar-fill"></div>
+              </div>
+              <div class="impact-scale">
+                <span>Bearish</span><span>Neutral</span><span>Bullish</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scenario explanation + FX note -->
+      <div class="grid-2 mt-sm">
+        <div>
+          <h3>Scenario Logic</h3>
+          <p id="scenarioDescription" class="note">
+            Choose a scenario to see behaviour patterns.
+          </p>
+        </div>
+        <div>
+          <h3>Currency & Local Impact</h3>
+          <p id="fxDescription" class="note">
+            INR strength/weakness can amplify or reduce moves in rupee terms.
+          </p>
+        </div>
+      </div>
+
+      <!-- Mini synthetic graph -->
+      <div class="mt-sm">
+        <h3>Relative Paths (Gold vs Silver vs Equity)</h3>
+        <p class="note">
+          Synthetic 5‑step path showing relative direction only (normalized starting point). [web:4][web:7][web:10][web:13]
+        </p>
+        <div id="metalsChart" class="metals-chart"></div>
+        <div class="metals-legend">
+          <span><span class="metals-dot gold"></span>Gold</span>
+          <span><span class="metals-dot silver"></span>Silver</span>
+          <span><span class="metals-dot equity"></span>Equity</span>
         </div>
       </div>
     </section>
