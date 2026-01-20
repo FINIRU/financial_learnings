@@ -254,6 +254,180 @@ function updateRetirement() {
     Math.min(100, Math.max(0, progress)) + "%";
 }
 
+// ---------- Metals / Stocks / FX scenarios ----------
+const metalsScenarios = {
+  crisis: {
+    name: "Crisis / Risk-off",
+    base: { gold: 0.8, silver: 0.6, equity: 0.2 },
+    description:
+      "In crises, investors typically sell equities and move into safe havens like gold. Silver often follows gold but with more volatility. [web:4][web:6][web:7][web:10][web:13]"
+  },
+  normal: {
+    name: "Normal Growth",
+    base: { gold: 0.4, silver: 0.5, equity: 0.7 },
+    description:
+      "In stable growth with low volatility, equities usually lead, while gold and silver act as diversifiers with lower correlation. [web:4][web:7]"
+  },
+  inflation: {
+    name: "High Inflation / Negative Real Rates",
+    base: { gold: 0.9, silver: 0.85, equity: 0.5 },
+    description:
+      "When inflation is high and real yields are low, gold and silver tend to benefit as stores of value, while equities face mixed impact. [web:5][web:7][web:10][web:13]"
+  },
+  liquidity: {
+    name: "Liquidity Boom / Everything Rally",
+    base: { gold: 0.7, silver: 0.9, equity: 0.9 },
+    description:
+      "Under aggressive liquidity and QE, both precious metals and equities can rally together, breaking the classic inverse pattern. [web:9][web:12]"
+  },
+  industrial: {
+    name: "Industrial / Commodity Upswing",
+    base: { gold: 0.5, silver: 0.85, equity: 0.8 },
+    description:
+      "With strong industrial demand, silver and cyclical equities often outperform, while gold plays a secondary but supportive role. [web:7][web:10][web:13]"
+  }
+};
+
+function applyFxAdjustment(baseImpact, fxMove) {
+  let adj = baseImpact;
+  if (fxMove === "inrWeak") {
+    adj += 0.1;
+  } else if (fxMove === "inrStrong") {
+    adj -= 0.1;
+  }
+  return Math.max(0, Math.min(1, adj));
+}
+
+function applyRiskAdjustment(impact, asset, riskLevel) {
+  let adj = impact;
+  if (riskLevel === "high") {
+    if (asset === "gold" || asset === "silver") adj += 0.1;
+    if (asset === "equity") adj -= 0.15;
+  } else if (riskLevel === "low") {
+    if (asset === "gold") adj -= 0.1;
+    if (asset === "equity") adj += 0.1;
+  }
+  return Math.max(0, Math.min(1, adj));
+}
+
+function updateMetalsScenario() {
+  const scenarioKey = $("scenarioSelect").value;
+  const fxMove = $("fxMoveSelect").value;
+  const riskLevel = $("riskSelect").value;
+
+  const scenario = metalsScenarios[scenarioKey];
+  if (!scenario) return;
+
+  let g = scenario.base.gold;
+  let s = scenario.base.silver;
+  let e = scenario.base.equity;
+
+  g = applyFxAdjustment(g, fxMove);
+  s = applyFxAdjustment(s, fxMove);
+
+  g = applyRiskAdjustment(g, "gold", riskLevel);
+  s = applyRiskAdjustment(s, "silver", riskLevel);
+  e = applyRiskAdjustment(e, "equity", riskLevel);
+
+  const toWidth = (x) => `${20 + x * 80}%`;
+
+  $("goldImpactBar").style.width = toWidth(g);
+  $("silverImpactBar").style.width = toWidth(s);
+  $("equityImpactBar").style.width = toWidth(e);
+
+  $("goldImpactText").textContent =
+    g >= 0.7
+      ? "Gold: Strong positive bias (safe-haven / inflation hedge)."
+      : g >= 0.4
+      ? "Gold: Moderate role as diversifier and hedge."
+      : "Gold: Lower expected participation; equities preferred.";
+
+  $("silverImpactText").textContent =
+    s >= 0.7
+      ? "Silver: High-beta behaviour; can swing more than gold."
+      : s >= 0.4
+      ? "Silver: Mixed industrial + monetary participation."
+      : "Silver: Likely muted; industrial and monetary drivers subdued.";
+
+  $("equityImpactText").textContent =
+    e >= 0.7
+      ? "Equities: Risk-on environment; growth assets favoured."
+      : e >= 0.4
+      ? "Equities: Balanced risk–reward, watch macro and earnings."
+      : "Equities: Risk-off tone; drawdown or defensive positioning likely.";
+
+  $("scenarioDescription").textContent = scenario.description;
+
+  let fxText = "";
+  if (fxMove === "flat") {
+    fxText =
+      "With a broadly stable INR, local gold and silver largely move with global prices and scenario dynamics.";
+  } else if (fxMove === "inrWeak") {
+    fxText =
+      "A weaker INR (USD up) amplifies gold and silver moves in rupee terms, while imported inflation can pressure equities.";
+  } else if (fxMove === "inrStrong") {
+    fxText =
+      "A stronger INR (USD down) can mute global gold/silver gains locally and support imports and some equity sectors.";
+  }
+  $("fxDescription").textContent = fxText;
+
+  renderMetalsMiniChart(g, s, e);
+}
+
+function renderMetalsMiniChart(gImpact, sImpact, eImpact) {
+  const container = $("metalsChart");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const steps = 5;
+  const buildPath = (impact) => {
+    const base = 1;
+    const drift = (impact - 0.5) * 0.5;
+    const arr = [];
+    let val = base;
+    for (let i = 0; i < steps; i++) {
+      val = val * (1 + drift / steps);
+      arr.push(val);
+    }
+    const max = Math.max(...arr);
+    return arr.map((v) => v / max);
+  };
+
+  const goldPath = buildPath(gImpact);
+  const silverPath = buildPath(sImpact);
+  const equityPath = buildPath(eImpact);
+
+  for (let i = 0; i < steps; i++) {
+    const col = document.createElement("div");
+    col.className = "metals-column";
+
+    const stack = document.createElement("div");
+    stack.className = "metals-stack";
+
+    const goldSeg = document.createElement("div");
+    goldSeg.className = "metals-line";
+    goldSeg.style.background = "#facc15";
+    goldSeg.style.height = `${20 + goldPath[i] * 80}%`;
+
+    const silverSeg = document.createElement("div");
+    silverSeg.className = "metals-line";
+    silverSeg.style.background = "#e5e7eb";
+    silverSeg.style.height = `${15 + silverPath[i] * 70}%`;
+
+    const equitySeg = document.createElement("div");
+    equitySeg.className = "metals-line";
+    equitySeg.style.background = "#22c55e";
+    equitySeg.style.height = `${15 + equityPath[i] * 75}%`;
+
+    stack.appendChild(goldSeg);
+    stack.appendChild(silverSeg);
+    stack.appendChild(equitySeg);
+
+    col.appendChild(stack);
+    container.appendChild(col);
+  }
+}
+
 // ---------- Tabs ----------
 function setupTabs() {
   const buttons = document.querySelectorAll(".tab-btn");
@@ -331,7 +505,13 @@ const tooltipContent = {
   expenses:
     "Current monthly lifestyle cost. This is projected into the future using inflation to calculate retirement needs.",
   inflation:
-    "Inflation is the rate at which prices rise. At 6%, prices roughly double in about 12 years (Rule of 72)."
+    "Inflation is the rate at which prices rise. At 6%, prices roughly double in about 12 years (Rule of 72).",
+  scenario:
+    "Predefined macro scenarios combining behaviour of gold, silver, and equities under different regimes like crisis, inflation and liquidity.",
+  fx:
+    "Currency move vs USD. A weaker INR (USD up) usually boosts rupee gold/silver prices, while a stronger INR can mute global gains.",
+  risk:
+    "Risk sentiment. High fear tends to benefit safe havens (gold) and hurt equities, while low fear favours risk assets."
 };
 
 function setupTooltips() {
@@ -362,7 +542,12 @@ function setupTooltips() {
 
 // ---------- Events wiring ----------
 function wireInputs() {
-  const idsGlobal = ["globalPrincipal", "globalRate", "globalYears", "compoundFreq"];
+  const idsGlobal = [
+    "globalPrincipal",
+    "globalRate",
+    "globalYears",
+    "compoundFreq"
+  ];
   idsGlobal.forEach((id) => {
     const el = $(id);
     el.addEventListener("input", () => {
@@ -375,11 +560,16 @@ function wireInputs() {
     });
   });
 
-  ["cdLoans", "cdDeposits", "grossNPA", "grossAdvances", "netInterestIncome", "earningAssets"].forEach(
-    (id) => {
-      $(id).addEventListener("input", updateBankingRatios);
-    }
-  );
+  [
+    "cdLoans",
+    "cdDeposits",
+    "grossNPA",
+    "grossAdvances",
+    "netInterestIncome",
+    "earningAssets"
+  ].forEach((id) => {
+    $(id).addEventListener("input", updateBankingRatios);
+  });
 
   [
     "pricePerShare",
@@ -404,6 +594,14 @@ function wireInputs() {
       $(id).addEventListener("input", updateRetirement);
     }
   );
+
+  // Metals / FX scenario selectors
+  ["scenarioSelect", "fxMoveSelect", "riskSelect"].forEach((id) => {
+    const el = $(id);
+    if (el) {
+      el.addEventListener("change", updateMetalsScenario);
+    }
+  });
 }
 
 // ---------- init ----------
@@ -419,4 +617,5 @@ document.addEventListener("DOMContentLoaded", () => {
   updateStockRatios();
   updateSipLumpsum();
   updateRetirement();
+  updateMetalsScenario();
 });
