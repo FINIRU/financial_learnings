@@ -35,6 +35,22 @@ function updateInterestMaster() {
 
   renderInterestChart(P, r, t, n);
 }
+// ---------- CAGR Calculator ----------
+function updateCagr() {
+  const initial = parseFloat($("cagrInitial").value) || 0;
+  const finalVal = parseFloat($("cagrFinal").value) || 0;
+  const years = parseFloat($("cagrYears").value) || 0;
+
+  let cagr = NaN;
+  if (initial > 0 && finalVal > 0 && years > 0) {
+    // CAGR = (FV / BV)^(1/n) - 1
+    cagr = Math.pow(finalVal / initial, 1 / years) - 1; // [web:37][web:39][web:40][web:42][web:45][web:48]
+  }
+
+  $("cagrResult").textContent = isFinite(cagr)
+    ? "CAGR: " + (cagr * 100).toFixed(2) + " %"
+    : "CAGR: –";
+}
 
 function renderInterestChart(P, r, t, n) {
   const container = $("interestChart");
@@ -478,6 +494,9 @@ function setupNav() {
 
 // ---------- Tooltips ----------
 const tooltipContent = {
+    cagr:
+    "CAGR = (Final / Initial)^(1/Years) - 1. It tells you the smoothed annual growth rate of an investment over the period.", // [web:37][web:39][web:40][web:48]
+
   "global-rate":
     "Global annual interest rate used across calculators. Example: 11% means ₹100 grows to ₹111 in one year before compounding.",
   "global-tenure":
@@ -594,6 +613,13 @@ function wireInputs() {
       $(id).addEventListener("input", updateRetirement);
     }
   );
+  // CAGR inputs
+  ["cagrInitial", "cagrFinal", "cagrYears"].forEach((id) => {
+    const el = $(id);
+    if (el) {
+      el.addEventListener("input", updateCagr);
+    }
+  });
 
   // Metals / FX scenario selectors
   ["scenarioSelect", "fxMoveSelect", "riskSelect"].forEach((id) => {
@@ -610,6 +636,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupNav();
   setupTooltips();
   wireInputs();
+  updateCagr();
 
   updateInterestMaster();
   updateMultiplierTable();
