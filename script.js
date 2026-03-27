@@ -44,7 +44,7 @@ function updateCagr() {
   let cagr = NaN;
   if (initial > 0 && finalVal > 0 && years > 0) {
     // CAGR = (FV / BV)^(1/n) - 1
-    cagr = Math.pow(finalVal / initial, 1 / years) - 1; // [web:37][web:39][web:40][web:42][web:45][web:48]
+    cagr = Math.pow(finalVal / initial, 1 / years) - 1; 
   }
 
   $("cagrResult").textContent = isFinite(cagr)
@@ -276,31 +276,31 @@ const metalsScenarios = {
     name: "Crisis / Risk-off",
     base: { gold: 0.8, silver: 0.6, equity: 0.2 },
     description:
-      "In crises, investors typically sell equities and move into safe havens like gold. Silver often follows gold but with more volatility. [web:4][web:6][web:7][web:10][web:13]"
+      "In crises, investors typically sell equities and move into safe havens like gold. Silver often follows gold but with more volatility. "
   },
   normal: {
     name: "Normal Growth",
     base: { gold: 0.4, silver: 0.5, equity: 0.7 },
     description:
-      "In stable growth with low volatility, equities usually lead, while gold and silver act as diversifiers with lower correlation. [web:4][web:7]"
+      "In stable growth with low volatility, equities usually lead, while gold and silver act as diversifiers with lower correlation. "
   },
   inflation: {
     name: "High Inflation / Negative Real Rates",
     base: { gold: 0.9, silver: 0.85, equity: 0.5 },
     description:
-      "When inflation is high and real yields are low, gold and silver tend to benefit as stores of value, while equities face mixed impact. [web:5][web:7][web:10][web:13]"
+      "When inflation is high and real yields are low, gold and silver tend to benefit as stores of value, while equities face mixed impact. "
   },
   liquidity: {
     name: "Liquidity Boom / Everything Rally",
     base: { gold: 0.7, silver: 0.9, equity: 0.9 },
     description:
-      "Under aggressive liquidity and QE, both precious metals and equities can rally together, breaking the classic inverse pattern. [web:9][web:12]"
+      "Under aggressive liquidity and QE, both precious metals and equities can rally together, breaking the classic inverse pattern. "
   },
   industrial: {
     name: "Industrial / Commodity Upswing",
     base: { gold: 0.5, silver: 0.85, equity: 0.8 },
     description:
-      "With strong industrial demand, silver and cyclical equities often outperform, while gold plays a secondary but supportive role. [web:7][web:10][web:13]"
+      "With strong industrial demand, silver and cyclical equities often outperform, while gold plays a secondary but supportive role. "
   }
 };
 
@@ -495,7 +495,7 @@ function setupNav() {
 // ---------- Tooltips ----------
 const tooltipContent = {
     cagr:
-    "CAGR = (Final / Initial)^(1/Years) - 1. It tells you the smoothed annual growth rate of an investment over the period.", // [web:37][web:39][web:40][web:48]
+    "CAGR = (Final / Initial)^(1/Years) - 1. It tells you the smoothed annual growth rate of an investment over the period.", 
 
   "global-rate":
     "Global annual interest rate used across calculators. Example: 11% means ₹100 grows to ₹111 in one year before compounding.",
